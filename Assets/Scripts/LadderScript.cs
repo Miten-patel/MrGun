@@ -1,18 +1,12 @@
 using UnityEngine;
 
-public class test : MonoBehaviour
+public class LadderScript : MonoBehaviour
 {
     public float climbSpeed = 2f; 
 
     private bool isClimbing = false; 
 
-    //private void OnTriggerEnter2D(Collider2D collision)
-    //{
-    //    if (collision.CompareTag("Ladder"))
-    //    {
-    //        isClimbing = true;
-    //    }
-    //}
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -30,13 +24,6 @@ public class test : MonoBehaviour
         }
     }
 
-    //private void OnTriggerExit2D(Collider2D collision)
-    //{
-    //    if (collision.CompareTag("Ladder"))
-    //    {
-    //        isClimbing = false;
-    //    }
-    //}
 
     private void FixedUpdate()
     {

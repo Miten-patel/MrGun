@@ -5,6 +5,8 @@ using UnityEngine;
 public class AimingScript : MonoBehaviour
 {
 
+    public static AimingScript inst;
+
     //public Quaternion _startPos;
     //public Quaternion _endPos;
     //public Quaternion _startPosEnemy;
@@ -13,6 +15,11 @@ public class AimingScript : MonoBehaviour
     public float degreesPerSecond;
     bool isRotatingup;
 
+
+    private void Awake()
+    {
+        inst = this;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -23,7 +30,6 @@ public class AimingScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Aiming();
     }
 
     public void RotateDown()
