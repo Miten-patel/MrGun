@@ -12,7 +12,6 @@ public class ShootingScript : MonoBehaviour
 
 
 
-    bool isrotating;
     // Update is called once per frame
 
     private void Awake()

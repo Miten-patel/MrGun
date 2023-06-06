@@ -7,10 +7,7 @@ public class AimingScript : MonoBehaviour
 
     public static AimingScript inst;
 
-    //public Quaternion _startPos;
-    //public Quaternion _endPos;
-    //public Quaternion _startPosEnemy;
-    //public Quaternion _endPosEnemy;
+
 
     public float degreesPerSecond;
     bool isRotatingup;
@@ -30,6 +27,7 @@ public class AimingScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
     }
 
     public void RotateDown()
@@ -44,6 +42,8 @@ public class AimingScript : MonoBehaviour
 
     public void Aiming()
     {
+
+        Debug.Log("Aim Started");
         if (isRotatingup)
         {
             transform.Rotate(new Vector3(0, 0, degreesPerSecond) * Time.deltaTime);
