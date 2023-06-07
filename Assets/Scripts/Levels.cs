@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurnManager : MonoBehaviour
+public class Levels : MonoBehaviour
 {
+
+    [SerializeField] private List<Platform> platforms = new List<Platform>();
     // Start is called before the first frame update
     void Start()
     {
@@ -15,4 +17,7 @@ public class TurnManager : MonoBehaviour
     {
         
     }
+
+
+
 }

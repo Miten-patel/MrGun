@@ -1,60 +1,42 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AimingScript : MonoBehaviour
 {
+    [SerializeField] private float _minAngle = -30f;
+    [SerializeField] private float _maxAngle = 30f; 
+    [SerializeField] private float _rotationSpeed = 5f;
+
+    private float currentAngle; 
+    private bool isAimingUp = true;
 
     public static AimingScript inst;
-
-
-
-    public float degreesPerSecond;
-    bool isRotatingup;
-
 
     private void Awake()
     {
         inst = this;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void Aim()
     {
-        isRotatingup = true;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    public void RotateDown()
-    {
-        isRotatingup = false;
-    }
-
-    public void RotateUp()
-    {
-        isRotatingup = true;
-    }
-
-    public void Aiming()
-    {
-
-        Debug.Log("Aim Started");
-        if (isRotatingup)
+        if (isAimingUp)
         {
-            transform.Rotate(new Vector3(0, 0, degreesPerSecond) * Time.deltaTime);
-
-            Invoke("RotateDown", 1);
+            currentAngle += _rotationSpeed * Time.deltaTime;
+            if (currentAngle >= _maxAngle)
+            {
+                currentAngle = _maxAngle;
+                isAimingUp = false;
+            }
         }
         else
         {
-            transform.Rotate(new Vector3(0, 0, -degreesPerSecond) * Time.deltaTime);
-
-            Invoke("RotateUp", 1);
+            currentAngle -= _rotationSpeed * Time.deltaTime;
+            if (currentAngle <= _minAngle)
+            {
+                currentAngle = _minAngle;
+                isAimingUp = true;
+            }
         }
+
+        transform.localRotation = Quaternion.Euler(0f, 0f, currentAngle);
     }
 }

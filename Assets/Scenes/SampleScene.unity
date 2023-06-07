@@ -804,6 +804,7 @@ GameObject:
   - component: {fileID: 426877256}
   - component: {fileID: 426877252}
   - component: {fileID: 426877259}
+  - component: {fileID: 426877260}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -826,6 +827,7 @@ MonoBehaviour:
   _bulletPrefab: {fileID: 4877706738557834073, guid: 66977ec3462ea4b70924f173874c5505, type: 3}
   _gunTip: {fileID: 104072556}
   shootingForce: 20
+  _player: {fileID: 426877251}
 --- !u!212 &426877256
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -902,17 +904,34 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 426877251}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8f1689ceeb37b45bbafb2e44c5609fea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 1
-  climbSpeed: 2
-  isClimbingRight: 0
+  upTime: 1
+  rightTime: 1
   movingup: 0
-  movingRight: 0
-  _targetPosition: 0
+--- !u!114 &426877260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 426877251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d241d24e79524e5e9f5d8f8436634da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _moveSpeed: 5
+  _stairsHeight: 0.3
+  _stairsWidth: 0.3
+  _noOfStairs: 10
+  targetPos: {x: 0, y: 0}
+  isMovingUp: 0
+  isclimbing: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,7 +1142,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &623255572
 Transform:
   m_ObjectHideFlags: 0
@@ -1802,7 +1821,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 881f22fffbd1c4f0f96a87a4e13509cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  degreesPerSecond: 50
+  _minAngle: -30
+  _maxAngle: 30
+  _rotationSpeed: 5
 --- !u!1 &1401943522
 GameObject:
   m_ObjectHideFlags: 0
@@ -2347,6 +2368,50 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1647636143
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1647636145}
+  - component: {fileID: 1647636144}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1647636144
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1647636143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34fed746bdf37477db2de7707305ea3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1647636145
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1647636143}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -11.815422, y: -13.522556, z: -0.3486273}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1679725951
 GameObject:
   m_ObjectHideFlags: 0
@@ -2477,7 +2542,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 881f22fffbd1c4f0f96a87a4e13509cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  degreesPerSecond: 50
+  _minAngle: 0
+  _maxAngle: 45
+  _rotationSpeed: 40
 --- !u!1 &1924607011
 GameObject:
   m_ObjectHideFlags: 0
@@ -2707,11 +2774,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  climbSpeed: 3
-  isClimbingRight: 0
+  upTime: 0
+  rightTime: 0
   movingup: 0
-  movingRight: 0
-  _targetPosition: 0
 --- !u!50 &2045203316
 Rigidbody2D:
   serializedVersion: 4
