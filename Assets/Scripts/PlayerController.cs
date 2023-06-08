@@ -23,13 +23,13 @@ public class PlayerController : MonoBehaviour
         timer = 1f;
 
 
-        Vector3 offset = transform.position;
+        //Vector3 offset = transform.position;
 
-        for (int i = 0; i < 15; i++)
-        {
-            GameObject.CreatePrimitive(PrimitiveType.Cube).transform.position = transform.position + offset;
-            offset += new Vector3(0.5f, 0.5f, 0);
-        }
+        //for (int i = 0; i < 15; i++)
+        //{
+        //    GameObject.CreatePrimitive(PrimitiveType.Cube).transform.position = transform.position + offset;
+        //    offset += new Vector3(0.5f, 0.5f, 0);
+        //}
 
     }
 
