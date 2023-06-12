@@ -7,13 +7,16 @@ public class PlatformData : MonoBehaviour
     public float stairsHeight;
     public float stairsWidth;
     public float noOfStairs;
-    public float _stairsHeight;
+    public Transform startPoint;
+    public Transform endPoint;
 
 
-    private void Start()
+    public static PlatformData inst;
+
+    private void Awake()
     {
-       _stairsHeight = noOfStairs * stairsHeight;
-
+        inst = this;
     }
+
 
 }

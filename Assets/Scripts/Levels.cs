@@ -7,29 +7,27 @@ public class Levels : MonoBehaviour
     public float moveSpeed;
 
     private int currentPlatformIndex;
+    private Transform playerTransform;
     private Vector2 targetPos;
     private bool isMovingUp;
     private bool isClimbing;
-    //private Vector3 initialPlayerScale;
-    private float moveDirection;
+    private int moveDirection;
+    private bool isStairsCompleted; 
+
 
     private void Start()
     {
-
-
-         
-
         currentPlatformIndex = 0;
-        isMovingUp = true;
         isClimbing = true;
         moveDirection = 1;
+        isStairsCompleted = false;
+
+        playerTransform = Player.inst._player;
 
         if (platformPrefabs.Count > 0)
         {
-            SetupPlatform();
+            MoveUpOrFinish();
         }
-
-
     }
 
     private void Update()
@@ -40,10 +38,10 @@ public class Levels : MonoBehaviour
         }
     }
 
-    public void Climb()
+    private void Climb()
     {
-        Vector2 newPos = Vector2.MoveTowards(Player.inst._player.position, targetPos, moveSpeed * Time.deltaTime);
-        Player.inst._player.position = newPos;
+        Vector2 newPos = Vector2.MoveTowards(playerTransform.position, targetPos, moveSpeed * Time.deltaTime);
+        playerTransform.position = newPos;
 
         if (newPos == targetPos)
         {
@@ -58,72 +56,75 @@ public class Levels : MonoBehaviour
         }
     }
 
-    public void MoveUpOrFinish()
+    private void MoveUpOrFinish()
     {
         if (currentPlatformIndex >= platformPrefabs.Count)
         {
-
             isClimbing = false;
-            return;
-        }
-
-        MoveUp();
-        isMovingUp = true;
-    }
-
-    public void MoveRightOrFinish()
-    {
-        GameObject currentPlatformPrefab = platformPrefabs[currentPlatformIndex];
-        PlatformData platformData = currentPlatformPrefab.GetComponent<PlatformData>();
-
-        if (platformData.noOfStairs > 0)
-        {
-            MoveRight();
-            platformData.noOfStairs--;
         }
         else
         {
-            //isClimbing = false;
-            currentPlatformIndex++;
+            MoveUp();
+            isMovingUp = true;
+            isStairsCompleted = false; 
+        }
+    }
 
+    private void MoveRightOrFinish()
+    {
+        if (currentPlatformIndex >= platformPrefabs.Count)
+        {
+            isClimbing = false;
+        }
+        else
+        {
+            GameObject currentPlatformPrefab = platformPrefabs[currentPlatformIndex];
+            PlatformData platformData = currentPlatformPrefab.GetComponent<PlatformData>();
 
-
-            moveDirection *= -1;
-
-            if (currentPlatformIndex >= platformPrefabs.Count)
+            if (platformData.noOfStairs > 0)
             {
+                if (isStairsCompleted)
+                {
+                    isClimbing = false; 
+                }
 
-                isClimbing = false;
+                MoveRight();
+                platformData.noOfStairs--;
+
+                isStairsCompleted = platformData.noOfStairs == 0; 
             }
             else
             {
-                MoveUp();
-                isMovingUp = true;
+                currentPlatformIndex++;
+                moveDirection *= -1;
+
+                if (currentPlatformIndex >= platformPrefabs.Count)
+                {
+                    isClimbing = false;
+                }
+                else
+                {
+                    MoveUp();
+                    isMovingUp = true;
+                    isStairsCompleted = false; 
+                }
             }
         }
     }
 
-
-
-
-
-
-
-    public void MoveUp()
+    private void MoveUp()
     {
-        targetPos = new Vector2(Player.inst._player.position.x, Player.inst._player.position.y + platformPrefabs[currentPlatformIndex].GetComponent<PlatformData>().stairsHeight);
+        GameObject currentPlatformPrefab = platformPrefabs[currentPlatformIndex];
+        PlatformData platformData = currentPlatformPrefab.GetComponent<PlatformData>();
+        targetPos = playerTransform.position + Vector3.up * platformData.stairsHeight;
     }
 
-    public void MoveRight()
+    private void MoveRight()
     {
-        targetPos = new Vector2(Player.inst._player.position.x + moveDirection * platformPrefabs[currentPlatformIndex].GetComponent<PlatformData>().stairsWidth, Player.inst._player.position.y);
+        GameObject currentPlatformPrefab = platformPrefabs[currentPlatformIndex];
+        PlatformData platformData = currentPlatformPrefab.GetComponent<PlatformData>();
+        targetPos = playerTransform.position + Vector3.right * moveDirection * platformData.stairsWidth;
         isMovingUp = false;
     }
 
-    private void SetupPlatform()
-    {
-        //GameObject currentPlatformPrefab = platformPrefabs[currentPlatformIndex];
-        //PlatformData platformData = currentPlatformPrefab.GetComponent<PlatformData>();
-        MoveRightOrFinish();
-    }
 }

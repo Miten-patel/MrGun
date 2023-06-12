@@ -5,15 +5,25 @@ using System;
 
 public class StateManager : MonoBehaviour
 {
+    public static StateManager instance;
 
-    Action PlayerStates;
+   
+    
+
+
+    public Action PlayerStates;
+
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        PlayerStates += Move;
-        PlayerStates += Aim;
-        PlayerStates += Shoot;
+        PlayerStates = Move;
+     
     }
 
     // Update is called once per frame
@@ -25,12 +35,17 @@ public class StateManager : MonoBehaviour
 
     public void Move()
     {
-        
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            PlayerStates = Player.inst.Climb;
+        }
     }
 
     public void Aim()
     {
         AimingScript.inst.Aim();
+        Shoot();
+ 
     }
 
     public void Shoot()
