@@ -7,49 +7,42 @@ public class StateManager : MonoBehaviour
 {
     public static StateManager instance;
 
-   
-    
-
-
     public Action PlayerStates;
-
 
     private void Awake()
     {
         instance = this;
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-        PlayerStates = Move;
-     
+        PlayerStates = Move; 
     }
 
-    // Update is called once per frame
     void Update()
     {
-        PlayerStates.Invoke();
+        if(PlayerStates != null)
+        {     
+            PlayerStates.Invoke();
+        }
     }
 
 
     public void Move()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            PlayerStates = Player.inst.Climb;
-        }
+        PlayerStates = Player.inst.Movements;
     }
 
     public void Aim()
     {
         AimingScript.inst.Aim();
         Shoot();
- 
     }
 
     public void Shoot()
     {
         ShootingScript.instance.Shoot();
     }
+
+
 }

@@ -16,6 +16,8 @@ public class ShootingScriptEnemy : MonoBehaviour
             ShootEnemy();
         }
 
+        transform.position = Vector3.MoveTowards(transform.position, Player.inst.platformData.endPoint.position, Time.deltaTime * 3);
+
     }
 
     void ShootEnemy()

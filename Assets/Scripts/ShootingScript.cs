@@ -10,11 +10,6 @@ public class ShootingScript : MonoBehaviour
     [SerializeField] private GameObject _player;
 
 
-
-
-
-    // Update is called once per frame
-
     private void Awake()
     {
         instance = this;

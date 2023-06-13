@@ -4,21 +4,20 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    
-    [SerializeField] public Transform _player;
 
-    public float moveSpeed;
 
+    public List<PlatformData> platformPrefabs;
+    public PlatformData platformData;
+    private int currentPlatformIndex;
+    private float moveDirection;
     private Vector2 targetPos;
+    private int noOfSteps;
+    public bool isMovingUp;
+    private Vector2 newScale;
 
+    
 
-
-    public float noOfSteps;
-    private int moveDirection;
-    public bool isMovingRight;
-    public bool isClimbing;
-    public bool isClimbed;
-
+    [SerializeField] private float moveSpeed;
 
     public static Player inst;
 
@@ -27,82 +26,111 @@ public class Player : MonoBehaviour
         inst = this;
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-
         noOfSteps = -1;
         moveDirection = 1;
-        //MoveUp();
+        currentPlatformIndex = 0;
+        newScale = transform.localScale;
+        platformData = platformPrefabs[currentPlatformIndex];
+
+
+        MoveTowardsStart();
 
     }
 
-    // Update is called once per frame
     void Update()
     {
-  
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            if (currentPlatformIndex < platformPrefabs.Count)
+            {
+                StateManager.instance.PlayerStates = Movements;
+            }
+        }
 
 
-        //if (noOfSteps == -1)
-        //{
-        //    transform.position = Vector3.MoveTowards(transform.position, PlatformData.inst.startPoint.position, Time.deltaTime * moveSpeed);
+        Debug.Log(newScale);
 
-        //}
+    }
+
+    public void Movements()
+    {
+
+        if (noOfSteps == -1)
+        {
+
+            transform.position = Vector3.MoveTowards(transform.position, platformData.startPoint.position, Time.deltaTime * moveSpeed);
+
+            if (transform.position == platformData.startPoint.position)
+            {
+                Debug.Log("Player = startpoint");
+                noOfSteps++;
+                isMovingUp = true;
+            }
+        }
+        else if (noOfSteps <= platformData.noOfStairs)
+        {
+            Climb();
+        }
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, platformData.endPoint.position, Time.deltaTime * moveSpeed);
+
+            if (transform.position == platformData.endPoint.position)
+            {
+                currentPlatformIndex++;
+
+              
+                if (currentPlatformIndex < platformPrefabs.Count)
+                {
+                    platformData = platformPrefabs[currentPlatformIndex];
+                }
+                else
+                {
+                    StateManager.instance.PlayerStates = null;
+                }
+
+                    MoveTowardsStart();
+                    noOfSteps = 0;
+                    newScale.x *= -1;
+                    moveDirection *= -1;
+                    transform.localScale = newScale;
+                    StateManager.instance.PlayerStates = StateManager.instance.Aim;
+                    Enemy.inst.EnemySpawnRight();
 
 
-        //if (PlatformData.inst.startPoint.position.x == transform.position.x)
-        //{
-        //    Debug.Log("transform = startpos");
-        //    //noOfSteps++;
-        //    isClimbing = true;
-        //}
+            }
 
-
-        //if (noOfSteps <= PlatformData.inst.noOfStairs && isClimbing == true)
-        //{
-        //    Debug.Log("climbing");
-        //    isClimbed = true;
-        //}
-        //else
-        //{
-        //    Debug.Log("Endpoint");
-        //    transform.position = Vector3.MoveTowards(transform.position, PlatformData.inst.endPoint.position, Time.deltaTime * moveSpeed);
-        //    isClimbed = false;
-        //}
+        }
 
     }
 
     public void Climb()
     {
-        Vector2 newPos = Vector2.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
 
+        Vector2 newPos = Vector2.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
         transform.position = newPos;
+
 
         if (newPos == targetPos)
         {
-            if (isMovingRight)
+            if (isMovingUp)
             {
-                MoveRight();
+                targetPos = transform.position + Vector3.up * platformData.stairsHeight;
+                isMovingUp = false;
+                noOfSteps++;
             }
             else
             {
-                MoveUp();
+                targetPos = transform.position + Vector3.right * moveDirection * platformData.stairsWidth;
+                isMovingUp = true;
             }
         }
-
     }
 
-    public void MoveUp()
+    public void MoveTowardsStart()
     {
-        targetPos = transform.position + Vector3.up * PlatformData.inst.stairsHeight;
-        isMovingRight = true;
-
-    }
-
-    public void MoveRight()
-    {
-        targetPos = transform.position + Vector3.right * moveDirection * PlatformData.inst.stairsWidth;
-        isMovingRight = false;
-        noOfSteps++;
+        targetPos = platformData.startPoint.position;
     }
 }
