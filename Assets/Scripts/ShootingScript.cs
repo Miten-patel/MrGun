@@ -8,6 +8,7 @@ public class ShootingScript : MonoBehaviour
     [SerializeField] private Transform _gunTip;
     [SerializeField] private float shootingForce = 10f;
     [SerializeField] private GameObject _player;
+    public bool bulletShooted;
 
 
     private void Awake()
@@ -18,7 +19,7 @@ public class ShootingScript : MonoBehaviour
     public void Shoot()
     {
 
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && bulletShooted == false)
         {
 
             GameObject newProjectile = Instantiate(_bulletPrefab, _gunTip.position, _gunTip.rotation);
@@ -26,13 +27,16 @@ public class ShootingScript : MonoBehaviour
 
             if (projectileRb != null && _player.transform.localScale.x > 0f)
             {
-
                 projectileRb.AddForce(_gunTip.right * shootingForce, ForceMode2D.Impulse);
+                bulletShooted = true;
+
             }
 
             else
             {
                 projectileRb.AddForce(_gunTip.right * -shootingForce, ForceMode2D.Impulse);
+                bulletShooted = true;
+
             }
 
         }

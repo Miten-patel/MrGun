@@ -35,6 +35,7 @@ public class StateManager : MonoBehaviour
 
     public void Aim()
     {
+        Debug.Log("Aim State");
         AimingScript.inst.Aim();
         Shoot();
     }
@@ -43,6 +44,8 @@ public class StateManager : MonoBehaviour
     {
         ShootingScript.instance.Shoot();
     }
+
+
 
 
 }

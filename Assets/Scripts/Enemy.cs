@@ -1,45 +1,69 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
 
-    [SerializeField] GameObject EnemyLeftPrefab;
-    [SerializeField] GameObject EnemyRightPrefab;
-    [SerializeField] private float speed;
-    public GameObject prefab;
+    [SerializeField] private GameObject _bulletPrefab;
+    [SerializeField] private Transform _gunTip;
+    [SerializeField] private float shootingForce = 10f;
+    [SerializeField] private GameObject _enemy;
 
 
-    public static Enemy inst;
-
-    private void Awake()
+    // Update is called once per frame
+    void Update()
     {
-        inst = this;
+        EnemyMove();
+
     }
 
-    private void Update()
-    {
-        
+
+    public void EnemyMove()
+    {  
+        transform.position = Vector3.MoveTowards(transform.position, Player.inst.platformData.endPoint.position, Time.deltaTime * 3);
     }
 
-    public void EnemySpawnLeft()
+
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        Instantiate(EnemyLeftPrefab, Player.inst.platformData.EnemyPoint.position, Quaternion.identity);
+        Destroy(gameObject);
     }
 
-    public void EnemySpawnRight()
+    private void OnDestroy()
     {
-        GameObject EnemyPrefab = Instantiate(EnemyRightPrefab, Player.inst.platformData.EnemyPoint.position, Quaternion.identity);
-        EnemyPrefab = prefab;
+        StateManager.instance.PlayerStates = Player.inst.Movements;
     }
 
-    //public void MoveEnemy()
-    //{
-    //    Debug.Log("Move Enemy");
-    //    EnemyLeftPrefab.transform.position = Vector3.MoveTowards(EnemyLeftPrefab.transform.position, Player.inst.platformData.endPoint.position, Time.deltaTime * speed);
-    //    EnemyRightPrefab.transform.position = Vector3.MoveTowards(EnemyRightPrefab.transform.position, Player.inst.platformData.endPoint.position, Time.deltaTime * speed);
-    //}
+    private void PointGunAtPlayer()
+    {
+        Vector3 playerPos = Player.inst.transform.position;
+        Vector3 direction = playerPos - transform.position;
+
+
+    }
+
+
+
+    public void Shoot()
+    {
+
+   
+            GameObject newProjectile = Instantiate(_bulletPrefab, _gunTip.position, _gunTip.rotation);
+            Rigidbody2D projectileRb = newProjectile.GetComponent<Rigidbody2D>();
+
+            if (projectileRb != null && _enemy.transform.localScale.x > 0f)
+            {
+
+                projectileRb.AddForce(_gunTip.right * shootingForce, ForceMode2D.Impulse);
+
+            }
+
+            else
+            {
+                projectileRb.AddForce(_gunTip.right * -shootingForce, ForceMode2D.Impulse);
+
+            }
+
+    }
 
 
 }
