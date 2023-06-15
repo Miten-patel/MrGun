@@ -1,26 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Player : MonoBehaviour
 {
-    public List<PlatformData> platformPrefabs;
-    public PlatformData platformData;
+
+    [SerializeField] private float moveSpeed;
+
+
     private int currentPlatformIndex;
     private float moveDirection;
     private Vector2 targetPos;
     private int noOfSteps;
-    public bool isMovingUp;
+    private bool isMovingUp;
     private Vector2 newScale;
 
-    [SerializeField] private float moveSpeed;
+    //Shooting
+    [SerializeField] private GameObject _bulletPrefab;
+    [SerializeField] private float shootingForce = 10f;
+    public Transform _gunTip;
+    private bool bulletShooted;
 
+    //Rotation 
+    [SerializeField] private Transform _gun;
+    private float _minAngle = 0;
+    private float _maxAngle = 45f;
+    private float _rotationSpeed = 40;
+    private float currentAngle;
+    private bool isAimingUp = true;
+    
+    //Action
+    public Action PlayerStates;
+
+
+    //Instance
     public static Player inst;
+
 
     private void Awake()
     {
         inst = this;
     }
+
+
 
     private void Start()
     {
@@ -28,26 +51,38 @@ public class Player : MonoBehaviour
         moveDirection = 1;
         currentPlatformIndex = 0;
         newScale = transform.localScale;
-        platformData = platformPrefabs[currentPlatformIndex];
+        StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[currentPlatformIndex];
 
         MoveTowardsStart();
+
+
+        PlayerStates = Movements;
+    }
+
+    private void Update()
+    {
+        if (PlayerStates != null)
+        {
+            PlayerStates.Invoke();
+        }
     }
 
 
     public void Movements()
     {
+        Debug.Log("Movements");
         if (noOfSteps == -1)
         {
             MoveTowardsStartPoint();
 
-            if (transform.position == platformData.startPoint.position)
+            if (transform.position == StairsManager.inst.platformData.startPoint.position)
             {
                 Debug.Log("Player = startpoint");
                 noOfSteps++;
                 isMovingUp = true;
             }
         }
-        else if (noOfSteps <= platformData.noOfStairs)
+        else if (noOfSteps <= StairsManager.inst.platformData.noOfStairs)
         {
             Climb();
         }
@@ -55,45 +90,39 @@ public class Player : MonoBehaviour
         {
             MoveTowardsEndPoint();
 
-            if (transform.position == platformData.endPoint.position)
+            if (transform.position == StairsManager.inst.platformData.endPoint.position)
             {
                 currentPlatformIndex++;
 
-                if (currentPlatformIndex < platformPrefabs.Count)
+                if (currentPlatformIndex < StairsManager.inst.platformPrefabs.Count)
                 {
-                    platformData = platformPrefabs[currentPlatformIndex];
+                    StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[currentPlatformIndex];
                 }
                 else
                 {
-                    StateManager.instance.PlayerStates = null;
+                    PlayerStates = null;
                 }
 
                 MoveTowardsStart();
+
                 noOfSteps = 0;
                 newScale.x *= -1;
                 moveDirection *= -1;
                 transform.localScale = newScale;
-                StateManager.instance.PlayerStates = StateManager.instance.Aim;
-                AimingScript.inst.Aim();
-                ShootingScript.instance.bulletShooted = false;
+                PlayerStates = Aiming;
+                bulletShooted = false;
 
-                if (transform.localScale.x > 0)
-                {
-                    Debug.Log("Leftspawn");
-                    EnemyManager.inst.EnemySpawnLeft();
-                }
-                else
-                {
-                    EnemyManager.inst.EnemySpawnRight();
-                }
+                EnemyManager.inst.SpawnEnemy();
+
             }
         }
     }
 
     private void MoveTowardsStartPoint()
     {
-        transform.position = Vector3.MoveTowards(transform.position, platformData.startPoint.position, Time.deltaTime * moveSpeed);
+        transform.position = Vector3.MoveTowards(transform.position, StairsManager.inst.platformData.startPoint.position, Time.deltaTime * moveSpeed);
     }
+
 
     private void Climb()
     {
@@ -104,25 +133,69 @@ public class Player : MonoBehaviour
         {
             if (isMovingUp)
             {
-                targetPos = transform.position + Vector3.up * platformData.stairsHeight;
+                targetPos = transform.position + Vector3.up * StairsManager.inst.platformData.stairsHeight;
                 isMovingUp = false;
                 noOfSteps++;
             }
             else
             {
-                targetPos = transform.position + Vector3.right * moveDirection * platformData.stairsWidth;
+                targetPos = transform.position + Vector3.right * moveDirection * StairsManager.inst.platformData.stairsWidth;
                 isMovingUp = true;
             }
         }
     }
 
+
     private void MoveTowardsEndPoint()
     {
-        transform.position = Vector3.MoveTowards(transform.position, platformData.endPoint.position, Time.deltaTime * moveSpeed);
+        transform.position = Vector3.MoveTowards(transform.position, StairsManager.inst.platformData.endPoint.position, Time.deltaTime * moveSpeed);
     }
+
 
     private void MoveTowardsStart()
     {
-        targetPos = platformData.startPoint.position;
+        targetPos = StairsManager.inst.platformData.startPoint.position;
     }
+
+
+
+
+    private void Aiming()
+    {
+
+        if (isAimingUp)
+        {
+            currentAngle += _rotationSpeed * Time.deltaTime;
+            if (currentAngle >= _maxAngle)
+            {
+                currentAngle = _maxAngle;
+                isAimingUp = false;
+            }
+        }
+        else
+        {
+            currentAngle -= _rotationSpeed * Time.deltaTime;
+            if (currentAngle <= _minAngle)
+            {
+                currentAngle = _minAngle;
+                isAimingUp = true;
+            }
+        }
+
+        _gun.localRotation = Quaternion.Euler(0f, 0f, currentAngle);
+
+        Shoot();
+
+    }
+
+
+    private void Shoot()
+    {
+        if (Input.GetKeyDown(KeyCode.Mouse0) && bulletShooted == false)
+        {
+            Instantiate(_bulletPrefab, _gunTip.position, Quaternion.identity);
+            bulletShooted = true;
+        }
+    }
+
 }

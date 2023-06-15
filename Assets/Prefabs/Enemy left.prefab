@@ -220,6 +220,9 @@ MonoBehaviour:
   _gunTip: {fileID: 2972371017263427181}
   shootingForce: 20
   _enemy: {fileID: 2972371018287424427}
+  BulletShooted: 0
+  _gun: {fileID: 2972371018695567142}
+  _health: 1
 --- !u!61 &2113362355128570349
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -230,7 +233,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.010362595, y: 0.67269003}

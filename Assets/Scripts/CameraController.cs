@@ -11,13 +11,19 @@ public class CameraController : MonoBehaviour
     void Update()
     {
 
-        if(_player.transform.position.y > transform.position.y)
+
+        CameraFollow();
+
+
+    }
+
+    public void CameraFollow()
+    {
+        if (_player.transform.position.y > transform.position.y)
         {
 
-            Vector3 newPos = new Vector3(transform.position.x, _player.position.y,transform.position.z);
+            Vector3 newPos = new Vector3(transform.position.x, _player.position.y, transform.position.z);
             transform.position = newPos;
         }
-
-
     }
 }

@@ -18,16 +18,18 @@ public class EnemyManager : MonoBehaviour
         inst = this;
     }
 
-    public void EnemySpawnLeft()
-    {
-        Debug.Log("left");
-        Instantiate(EnemyLeftPrefab, Player.inst.platformData.EnemyPoint.position, Quaternion.identity);
-    }
 
-    public void EnemySpawnRight()
+    public void SpawnEnemy()
     {
-        Debug.Log("Rigtht");
-        Instantiate(EnemyRightPrefab, Player.inst.platformData.EnemyPoint.position, Quaternion.identity);
+        if (Player.inst.transform.localScale.x > 0)
+        {
+            Debug.Log("Leftspawn");
+            Instantiate(EnemyLeftPrefab, StairsManager.inst.platformData.EnemyPoint.position, Quaternion.identity);
+        }
+        else
+        {
+            Instantiate(EnemyRightPrefab, StairsManager.inst.platformData.EnemyPoint.position, Quaternion.identity);
+        }
     }
 
 
