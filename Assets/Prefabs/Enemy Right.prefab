@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfe554346d2e3486abe2eca3e8755973, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bulletPrefab: {fileID: 4877706738557834073, guid: 6b0ec077ec1f64e5db160aad7e38d29b, type: 3}
+  _bulletPrefab: {fileID: 4877706738557834073, guid: 66977ec3462ea4b70924f173874c5505, type: 3}
   _gunTip: {fileID: 2972371017263427181}
   shootingForce: 20
   _enemy: {fileID: 2972371018287424427}

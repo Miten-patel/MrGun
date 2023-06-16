@@ -16,13 +16,19 @@ public class Player : MonoBehaviour
     private bool isMovingUp;
     private Vector2 newScale;
 
-    //Shooting
-    [SerializeField] private GameObject _bulletPrefab;
+
+    [SerializeField] private EnemyManager _enemyManager;
+    
+    [Header("Shooting")]
+    [SerializeField] private Bullet _bulletPrefab;
     [SerializeField] private float shootingForce = 10f;
+    private Bullet _prefab;
     public Transform _gunTip;
+
     private bool bulletShooted;
 
-    //Rotation 
+    //Rotation
+
     [SerializeField] private Transform _gun;
     private float _minAngle = 0;
     private float _maxAngle = 45f;
@@ -32,6 +38,7 @@ public class Player : MonoBehaviour
     
     //Action
     public Action PlayerStates;
+    //public Action _Enemy;
 
 
     //Instance
@@ -61,6 +68,8 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+
+       
         if (PlayerStates != null)
         {
             PlayerStates.Invoke();
@@ -92,31 +101,41 @@ public class Player : MonoBehaviour
 
             if (transform.position == StairsManager.inst.platformData.endPoint.position)
             {
-                currentPlatformIndex++;
 
-                if (currentPlatformIndex < StairsManager.inst.platformPrefabs.Count)
-                {
-                    StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[currentPlatformIndex];
-                }
-                else
-                {
-                    PlayerStates = null;
-                }
-
-                MoveTowardsStart();
-
-                noOfSteps = 0;
-                newScale.x *= -1;
-                moveDirection *= -1;
-                transform.localScale = newScale;
-                PlayerStates = Aiming;
-                bulletShooted = false;
-
-                EnemyManager.inst.SpawnEnemy();
+                NextPlatformTransition();
 
             }
         }
     }
+
+    private void NextPlatformTransition()
+    {
+        currentPlatformIndex++;
+
+        if (currentPlatformIndex < StairsManager.inst.platformPrefabs.Count)
+        {
+            
+            PlayerStates = Aiming;
+            StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[currentPlatformIndex];
+            MoveTowardsStart();
+
+            noOfSteps = 0;
+            newScale.x *= -1;
+            moveDirection *= -1;
+            transform.localScale = newScale;
+
+            _enemyManager.SpawnEnemy();
+        }
+        else
+        {
+            Debug.Log("NUll");
+            PlayerStates = null;
+        }
+
+
+
+    }
+
 
     private void MoveTowardsStartPoint()
     {
@@ -184,6 +203,7 @@ public class Player : MonoBehaviour
 
         _gun.localRotation = Quaternion.Euler(0f, 0f, currentAngle);
 
+        _bulletPrefab.PlayerShoot(_gunTip, transform);
         Shoot();
 
     }
@@ -191,11 +211,30 @@ public class Player : MonoBehaviour
 
     private void Shoot()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0) && bulletShooted == false)
+       
+        if (Input.GetMouseButtonDown(0) && !bulletShooted)
         {
-            Instantiate(_bulletPrefab, _gunTip.position, Quaternion.identity);
+            _prefab = Instantiate(_bulletPrefab, _gunTip.position, _gunTip.rotation);
+            _prefab.PlayerShoot(_gunTip, transform);
             bulletShooted = true;
+
+        }
+        else if( bulletShooted && _prefab == null) 
+        {
+            PlayerStates = Movements;
+            bulletShooted = false;
         }
     }
+
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if(collision.gameObject.GetComponent<Bullet>())
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
+
 
 }

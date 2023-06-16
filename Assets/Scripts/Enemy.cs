@@ -4,7 +4,7 @@ public class Enemy : MonoBehaviour
 {
 
     [SerializeField] private GameObject _bulletPrefab;
-    [SerializeField] private Transform _gunTip;
+    public Transform _gunTip;
     [SerializeField] private float shootingForce = 10f;
     [SerializeField] private GameObject _enemy;
     [SerializeField] private bool BulletShooted;
@@ -44,11 +44,19 @@ public class Enemy : MonoBehaviour
     }
 
 
+    private void OnEnable()
+    {
+        Events.BulletMiss += PointGunAtPlayer;
+    }
 
+    private void OnDisable()
+    {
+        Events.BulletMiss -= PointGunAtPlayer;
+    }
 
     public  void PointGunAtPlayer()
     {
-
+        Debug.Log("Aim");
         Vector3 playerPos = Player.inst.transform.position;
         Vector3 direction = playerPos - transform.position;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
@@ -64,20 +72,24 @@ public class Enemy : MonoBehaviour
 
     public void Shoot()
     {
-        if (BulletShooted == false)
+        if (!BulletShooted)
         {
 
             GameObject newProjectile = Instantiate(_bulletPrefab, _gunTip.position, _gunTip.rotation);
+            BulletShooted = true;
+
             Rigidbody2D projectileRb = newProjectile.GetComponent<Rigidbody2D>();
 
-            if (projectileRb != null && _enemy.transform.localScale.x > 0f)
+            if (projectileRb != null && transform.localScale.x > 0f)
             {
+                Debug.Log("positive Force");
                 projectileRb.AddForce(_gunTip.right * shootingForce, ForceMode2D.Impulse);
                 BulletShooted = true;
             }
 
             else
             {
+                Debug.Log("negative Force");
                 projectileRb.AddForce(_gunTip.right * -shootingForce, ForceMode2D.Impulse);
                 BulletShooted = true;
 
@@ -85,6 +97,9 @@ public class Enemy : MonoBehaviour
         }
 
     }
+
+
+    
 
 
 }

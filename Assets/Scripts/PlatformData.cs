@@ -13,12 +13,6 @@ public class PlatformData : MonoBehaviour
     public Transform endPoint;
     public Transform EnemyPoint;
 
-    public static PlatformData instance;
-
-    private void Awake()
-    {
-        instance = this;
-    }
 
     private void Start()
     {

@@ -5,38 +5,71 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     [SerializeField] float force;
-    private Rigidbody2D rb;
+    [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private Enemy _enemy;
+    private Transform _playerTransform;
+    private Transform _gunTip;
 
+    private bool isCollided;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        PlayerShoot(_gunTip,_playerTransform);
+        //rb = GetComponent<Rigidbody2D>();
 
-        PlayerShoot();
+        isCollided = false;
+        Destroy(gameObject, 3);
+    }
+
+    private void OnDisable()
+    {
+        Debug.Log(isCollided + "Iscollised");
+
+        if(!isCollided)
+        {
+            Events.BulletMiss?.Invoke();
+        }
     }
 
 
-    public void PlayerShoot()
+
+
+    public void PlayerShoot(Transform _gunTip, Transform _playerTransform)
     {
-        if (Player.inst.transform.localScale.x > 0)
+        Debug.Log("PlayerSHoot");
+        this._gunTip = _gunTip;
+        this._playerTransform = _playerTransform;
+
+        if (_playerTransform.localScale.x > 0)
         {
-            rb.AddForce(Player.inst._gunTip.right * force, ForceMode2D.Impulse);
+            rb.AddForce(_gunTip.right * force, ForceMode2D.Impulse);
         }
 
         else
         {
-            rb.AddForce(Player.inst._gunTip.right * -force, ForceMode2D.Impulse);
+            rb.AddForce(_gunTip.right * -force, ForceMode2D.Impulse);
         }
     }
 
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.gameObject.GetComponent<Enemy>() != null)
+        {
+            Debug.Log("Player Collision");
+            isCollided = true;
+        }
+        
         if(collision.gameObject.GetComponent<Enemy>())
         {
             Debug.Log("Enemy collided");
-            Enemy.Inst._health--;
+            //_enemy._health--;
+            Destroy(gameObject);
+            Destroy(collision.gameObject);
         }
+
+
+
     }
 
 

@@ -137,3 +137,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   force: 10
+  rb: {fileID: 7523453725113333301}
+  _enemy: {fileID: 2972371018287424418, guid: 6f2500027f87549c095d5f8745fc60cf, type: 3}
