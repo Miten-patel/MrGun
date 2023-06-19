@@ -81,6 +81,7 @@ public class Player : MonoBehaviour
         }
         else if (noOfSteps <= StairsManager.inst.platformData.noOfStairs)
         {
+            Debug.Log("climbingggggggg  ");
             Climb();
         }
         else

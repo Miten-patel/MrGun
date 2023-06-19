@@ -38,7 +38,7 @@ public class Enemy : MonoBehaviour
     private void Start()
     {
         noOfSteps = -1;
-        moveDirection = 1;
+        moveDirection = -1;
         newScale = transform.localScale;
 
         player = FindAnyObjectByType<Player>();
@@ -55,10 +55,7 @@ public class Enemy : MonoBehaviour
 
         ClimbMovementAction?.Invoke();
 
-        if(isMovingUp)
-        {
-            MoveTowardsStartPoint();
-        }
+
     }
 
     private void OnEnable()
@@ -101,9 +98,9 @@ public class Enemy : MonoBehaviour
         else
         {
             //isMovingUp = true;
-            //MoveTowardsStart();
+            MoveTowardsStart();
 
-            EnemyMoveAction = EnemyMovements;
+            ClimbMovementAction = EnemyMovements;
 
         }
 
@@ -124,6 +121,7 @@ public class Enemy : MonoBehaviour
 
     public void EnemyMovements()
     {
+        Debug.Log("EnemyMovement");
 
         if (noOfSteps == -1)
         {
@@ -134,11 +132,14 @@ public class Enemy : MonoBehaviour
             //if (transform.position == StairsManager.inst.platformData.startPoint.position)
             if (Vector3.Distance(transform.position, enemyPlatformData.startPoint.position) < 0.05f)
             {
+
+                Debug.Log("transform ====== start");
                 noOfSteps++;
                 isMovingUp = true;
             }
         }
-        else if (noOfSteps <= enemyPlatformData.noOfStairs)
+
+        if ((noOfSteps >= 0) && noOfSteps <= enemyPlatformData.noOfStairs)
         {
             EnemyClimb();
         }
@@ -149,16 +150,57 @@ public class Enemy : MonoBehaviour
             if (transform.position == enemyPlatformData.endPoint.position)
             {
 
-                //NextPlatformTransition();
+                NextPlatformTransition();
 
             }
         }
     }
 
+    private void NextPlatformTransition()
+    {
+
+        if (enemyIndex < StairsManager.inst.platformPrefabs.Count)
+        {
+            enemyIndex++;
+
+            enemyPlatformData = StairsManager.inst.platformPrefabs[enemyIndex + 1];
+
+            //PlayerStates = Aiming;
+            MoveTowardsStart();
+
+            noOfSteps = 0;
+            newScale.x *= -1;
+            moveDirection *= -1;
+            transform.localScale = newScale;
+
+
+            //if (_enemyManager.enemy == null && _enemyManager.enemyCount >= 0)
+            //{
+            //    _enemyManager.SpawnEnemy();
+
+
+            //}
+            //else if (_enemyManager.bossEnemy == null && _enemyManager.bossCount > 0)
+            //{
+            //    _enemyManager.SpawnBoss();
+
+            //}
+
+
+        }
+        else
+        {
+            //PlayerStates = null;
+        }
+
+
+
+    }
+
+
 
     private void MoveTowardsStartPoint()
     {
-
         transform.position = Vector3.MoveTowards(transform.position, enemyPlatformData.startPoint.position, Time.deltaTime * moveSpeed);
     }
 
@@ -195,6 +237,7 @@ public class Enemy : MonoBehaviour
 
     private void MoveTowardsStart()
     {
+        Debug.Log("movetowards Start");
 
         targetPos = enemyPlatformData.startPoint.position;
     }
