@@ -129,7 +129,7 @@ GameObject:
   - component: {fileID: 2972371018287424418}
   - component: {fileID: -8778277920013807512}
   m_Layer: 0
-  m_Name: Enemy Right
+  m_Name: BossEnemyRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -220,8 +220,12 @@ MonoBehaviour:
   shootingForce: 20
   BulletShooted: 0
   _gun: {fileID: 2972371018695567142}
+  enemyManager: {fileID: 0}
   _gunTip: {fileID: 2972371017263427181}
-  _health: 100
+  _health: 500
+  moveSpeed: 3
+  player: {fileID: 0}
+  ismoving: 0
 --- !u!61 &-8778277920013807512
 BoxCollider2D:
   m_ObjectHideFlags: 0

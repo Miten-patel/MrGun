@@ -14,7 +14,7 @@ public class PlatformData : MonoBehaviour
     public Transform EnemyPoint;
 
 
-    private void Start()
+    private void Awake()
     {
         startPoint = gameObject.GetComponentInChildren<Transform>().GetChild(0);
         endPoint = gameObject.GetComponentInChildren<Transform>().GetChild(1);

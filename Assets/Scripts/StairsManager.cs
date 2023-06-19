@@ -6,6 +6,7 @@ public class StairsManager : MonoBehaviour
 {
     public List<PlatformData> platformPrefabs;
     public PlatformData platformData;
+    
 
     public static StairsManager inst;
 

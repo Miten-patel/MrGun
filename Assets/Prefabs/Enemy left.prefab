@@ -216,13 +216,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfe554346d2e3486abe2eca3e8755973, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bulletPrefab: {fileID: 4877706738557834073, guid: 66977ec3462ea4b70924f173874c5505, type: 3}
-  _gunTip: {fileID: 2972371017263427181}
+  _bulletPrefab: {fileID: 699908612012642908, guid: 66977ec3462ea4b70924f173874c5505, type: 3}
   shootingForce: 20
-  _enemy: {fileID: 2972371018287424427}
   BulletShooted: 0
   _gun: {fileID: 2972371018695567142}
-  _health: 1
+  _gunTip: {fileID: 2972371017263427181}
+  _health: 100
 --- !u!61 &2113362355128570349
 BoxCollider2D:
   m_ObjectHideFlags: 0

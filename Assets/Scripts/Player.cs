@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     [SerializeField] private float moveSpeed;
 
 
-    private int currentPlatformIndex;
+    public int currentPlatformIndex;
     private float moveDirection;
     private Vector2 targetPos;
     private int noOfSteps;
@@ -36,19 +36,7 @@ public class Player : MonoBehaviour
     private float currentAngle;
     private bool isAimingUp = true;
     
-    //Action
     public Action PlayerStates;
-    //public Action _Enemy;
-
-
-    //Instance
-    public static Player inst;
-
-
-    private void Awake()
-    {
-        inst = this;
-    }
 
 
 
@@ -79,14 +67,14 @@ public class Player : MonoBehaviour
 
     public void Movements()
     {
-        Debug.Log("Movements");
         if (noOfSteps == -1)
         {
             MoveTowardsStartPoint();
 
-            if (transform.position == StairsManager.inst.platformData.startPoint.position)
+            //if (transform.position == StairsManager.inst.platformData.startPoint.position)
+            if(Vector3.Distance(transform.position, StairsManager.inst.platformData.startPoint.position) < 0.05f)
             {
-                Debug.Log("Player = startpoint");
+                Debug.Log("ismovingup === trueeeee");
                 noOfSteps++;
                 isMovingUp = true;
             }
@@ -110,10 +98,10 @@ public class Player : MonoBehaviour
 
     private void NextPlatformTransition()
     {
-        currentPlatformIndex++;
 
         if (currentPlatformIndex < StairsManager.inst.platformPrefabs.Count)
         {
+            currentPlatformIndex++;
             
             PlayerStates = Aiming;
             StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[currentPlatformIndex];
@@ -124,11 +112,23 @@ public class Player : MonoBehaviour
             moveDirection *= -1;
             transform.localScale = newScale;
 
-            _enemyManager.SpawnEnemy();
+
+            if (_enemyManager.enemy == null && _enemyManager.enemyCount >= 0)
+            {
+                _enemyManager.SpawnEnemy();
+                
+
+            }
+            else if(_enemyManager.bossEnemy == null && _enemyManager.bossCount > 0)
+            {
+                _enemyManager.SpawnBoss();
+
+            }
+
+
         }
         else
         {
-            Debug.Log("NUll");
             PlayerStates = null;
         }
 
@@ -229,7 +229,9 @@ public class Player : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.gameObject.GetComponent<Bullet>())
+        Bullet bullet = collision.GetComponent<Bullet>();
+
+        if(bullet != null)
         {
             gameObject.SetActive(false);
         }

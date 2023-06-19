@@ -1,63 +1,218 @@
 using UnityEngine;
+using System;
 
 public class Enemy : MonoBehaviour
 {
 
-    [SerializeField] private GameObject _bulletPrefab;
-    public Transform _gunTip;
+    [SerializeField] private Bullet _bulletPrefab;
     [SerializeField] private float shootingForce = 10f;
-    [SerializeField] private GameObject _enemy;
     [SerializeField] private bool BulletShooted;
     [SerializeField] private Transform _gun;
-    public float _health = 1;
+    [SerializeField] private EnemyManager enemyManager;
+    public Transform _gunTip;
+    public float _health = 100;
 
 
+    private Vector2 targetPos;
+
+    [Range(3,10)]
+    [SerializeField] private float moveSpeed;
+    private int noOfSteps;
+    private bool isMovingUp;
+    private Vector2 newScale;
+    private float moveDirection;
 
 
+    public Player player;
 
-    public static Enemy Inst;
+
+    private int enemyIndex;
+
+    public bool ismoving;
+    private PlatformData enemyPlatformData;
 
 
-    private void Awake()
+    public Action EnemyMoveAction;
+    public Action ClimbMovementAction;
+
+    private void Start()
     {
-        Inst = this;
+        noOfSteps = -1;
+        moveDirection = 1;
+        newScale = transform.localScale;
+
+        player = FindAnyObjectByType<Player>();
+        enemyIndex = player.currentPlatformIndex;
+        enemyPlatformData = StairsManager.inst.platformPrefabs[enemyIndex + 1];
+
+
+
     }
-    // Update is called once per frame
+
     void Update()
     {
-        EnemyMove();
-        Health();
+        EnemyMoveAction?.Invoke();
+
+        ClimbMovementAction?.Invoke();
+
+        if(isMovingUp)
+        {
+            MoveTowardsStartPoint();
+        }
     }
+
+    private void OnEnable()
+    {
+        Events.BulletMissAction += PointGunAtPlayer;
+        EnemyMoveAction += EnemyMove; 
+    }
+
+
 
 
     public void EnemyMove()
-    {  
+    {
+        StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[enemyIndex];
+
+
         transform.position = Vector3.MoveTowards(transform.position, StairsManager.inst.platformData.endPoint.position, Time.deltaTime * 3);
+
+        if (Vector3.Distance(transform.position, StairsManager.inst.platformData.endPoint.position) < 0.05f)
+        {
+
+
+            EnemyMoveAction -= EnemyMove;
+
+        }
+
+
     }
 
-    public void Health()
+
+    public void TakeDamage(int damage)
     {
+        _health -= damage;
+
         if (_health <= 0)
         {
-            Destroy(gameObject);
+            Debug.Log("die");
+            Die();
+        }
+        else
+        {
+            //isMovingUp = true;
+            //MoveTowardsStart();
+
+            EnemyMoveAction = EnemyMovements;
+
+        }
+
+    }
+
+
+    private void Die()
+    {
+        Destroy(gameObject);
+    }
+
+    public void moveEnemy()
+    {
+
+        MoveTowardsStartPoint();
+    }
+
+
+    public void EnemyMovements()
+    {
+
+        if (noOfSteps == -1)
+        {
+
+            Debug.Log("== -1");
+            MoveTowardsStartPoint();
+
+            //if (transform.position == StairsManager.inst.platformData.startPoint.position)
+            if (Vector3.Distance(transform.position, enemyPlatformData.startPoint.position) < 0.05f)
+            {
+                noOfSteps++;
+                isMovingUp = true;
+            }
+        }
+        else if (noOfSteps <= enemyPlatformData.noOfStairs)
+        {
+            EnemyClimb();
+        }
+        else
+        {
+            MoveTowardsEndPoint();
+
+            if (transform.position == enemyPlatformData.endPoint.position)
+            {
+
+                //NextPlatformTransition();
+
+            }
         }
     }
 
 
-    private void OnEnable()
+    private void MoveTowardsStartPoint()
     {
-        Events.BulletMiss += PointGunAtPlayer;
+
+        transform.position = Vector3.MoveTowards(transform.position, enemyPlatformData.startPoint.position, Time.deltaTime * moveSpeed);
     }
 
-    private void OnDisable()
+
+    private void EnemyClimb()
     {
-        Events.BulletMiss -= PointGunAtPlayer;
+
+        Vector2 newPos = Vector2.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
+        transform.position = newPos;
+
+        if (newPos == targetPos)
+        {
+            if (isMovingUp)
+            {
+                targetPos = transform.position + Vector3.up * enemyPlatformData.stairsHeight;
+                isMovingUp = false;
+                noOfSteps++;
+            }
+            else
+            {
+                targetPos = transform.position + Vector3.right * moveDirection * enemyPlatformData.stairsWidth;
+                isMovingUp = true;
+            }
+        }
     }
+
+
+    private void MoveTowardsEndPoint()
+    {
+
+        transform.position = Vector3.MoveTowards(transform.position, enemyPlatformData.endPoint.position, Time.deltaTime * moveSpeed);
+    }
+
+
+    private void MoveTowardsStart()
+    {
+
+        targetPos = enemyPlatformData.startPoint.position;
+    }
+
+
+
+
+
+
+
+
 
     public  void PointGunAtPlayer()
     {
-        Debug.Log("Aim");
-        Vector3 playerPos = Player.inst.transform.position;
+        Debug.Log("gunPointed");
+        Player player =  FindAnyObjectByType<Player>();
+
+        Vector3 playerPos = player.transform.position;
         Vector3 direction = playerPos - transform.position;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
@@ -75,7 +230,7 @@ public class Enemy : MonoBehaviour
         if (!BulletShooted)
         {
 
-            GameObject newProjectile = Instantiate(_bulletPrefab, _gunTip.position, _gunTip.rotation);
+            Bullet newProjectile = Instantiate(_bulletPrefab, _gunTip.position, _gunTip.rotation);
             BulletShooted = true;
 
             Rigidbody2D projectileRb = newProjectile.GetComponent<Rigidbody2D>();
@@ -99,6 +254,13 @@ public class Enemy : MonoBehaviour
     }
 
 
+
+
+    private void OnDisable()
+    {
+        Events.BulletMissAction -= PointGunAtPlayer;
+        EnemyMoveAction -= EnemyMove;
+    }
     
 
 

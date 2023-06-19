@@ -7,6 +7,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] float force;
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Enemy _enemy;
+    [SerializeField] private int _damage = 100;
     private Transform _playerTransform;
     private Transform _gunTip;
 
@@ -15,7 +16,6 @@ public class Bullet : MonoBehaviour
     void Start()
     {
         PlayerShoot(_gunTip,_playerTransform);
-        //rb = GetComponent<Rigidbody2D>();
 
         isCollided = false;
         Destroy(gameObject, 3);
@@ -27,7 +27,7 @@ public class Bullet : MonoBehaviour
 
         if(!isCollided)
         {
-            Events.BulletMiss?.Invoke();
+            Events.BulletMiss();
         }
     }
 
@@ -54,21 +54,16 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.GetComponent<Enemy>() != null)
+        Enemy enemy = collision.GetComponent<Enemy>();
+
+        if (enemy != null)
         {
-            Debug.Log("Player Collision");
             isCollided = true;
-        }
-        
-        if(collision.gameObject.GetComponent<Enemy>())
-        {
-            Debug.Log("Enemy collided");
-            //_enemy._health--;
+
+            enemy.TakeDamage(100);
             Destroy(gameObject);
-            Destroy(collision.gameObject);
         }
-
-
+    
 
     }
 
