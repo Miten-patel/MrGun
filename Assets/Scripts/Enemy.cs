@@ -4,36 +4,29 @@ using System;
 public class Enemy : MonoBehaviour
 {
 
-    [SerializeField] private Bullet _bulletPrefab;
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private GameObject _bulletPrefab;
     [SerializeField] private float shootingForce = 10f;
     [SerializeField] private bool BulletShooted;
     [SerializeField] private Transform _gun;
     [SerializeField] private EnemyManager enemyManager;
+
+    public Player player;
+    public bool ismoving;
     public Transform _gunTip;
     public float _health = 100;
 
-
-    private Vector2 targetPos;
-
-    [Range(3,10)]
-    [SerializeField] private float moveSpeed;
-    private int noOfSteps;
-    private bool isMovingUp;
-    private Vector2 newScale;
-    private float moveDirection;
-
-
-    public Player player;
-
-
-    private int enemyIndex;
-
-    public bool ismoving;
-    private PlatformData enemyPlatformData;
-
-
     public Action EnemyMoveAction;
     public Action ClimbMovementAction;
+
+    [Range(3,10)]
+    private int noOfSteps;
+    private int enemyIndex;
+    private bool isMovingUp;
+    private Vector2 newScale;
+    private Vector2 targetPos;
+    private float moveDirection;
+    private PlatformData enemyPlatformData;
 
     private void Start()
     {
@@ -45,18 +38,16 @@ public class Enemy : MonoBehaviour
         enemyIndex = player.currentPlatformIndex;
         enemyPlatformData = StairsManager.inst.platformPrefabs[enemyIndex + 1];
 
-
-
     }
 
     void Update()
     {
         EnemyMoveAction?.Invoke();
 
-        ClimbMovementAction?.Invoke();
 
-
+        Events.BulletHit();
     }
+
 
     private void OnEnable()
     {
@@ -65,23 +56,19 @@ public class Enemy : MonoBehaviour
     }
 
 
-
-
     public void EnemyMove()
     {
-        StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[enemyIndex];
 
+        StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[enemyIndex];
 
         transform.position = Vector3.MoveTowards(transform.position, StairsManager.inst.platformData.endPoint.position, Time.deltaTime * 3);
 
         if (Vector3.Distance(transform.position, StairsManager.inst.platformData.endPoint.position) < 0.05f)
         {
 
-
             EnemyMoveAction -= EnemyMove;
 
         }
-
 
     }
 
@@ -97,10 +84,8 @@ public class Enemy : MonoBehaviour
         }
         else
         {
-            //isMovingUp = true;
             MoveTowardsStart();
-
-            ClimbMovementAction = EnemyMovements;
+            Events.BulletHitAction = EnemyMovements;
 
         }
 
@@ -114,26 +99,21 @@ public class Enemy : MonoBehaviour
 
     public void moveEnemy()
     {
-
         MoveTowardsStartPoint();
     }
 
 
     public void EnemyMovements()
     {
-        Debug.Log("EnemyMovement");
 
         if (noOfSteps == -1)
         {
 
-            Debug.Log("== -1");
             MoveTowardsStartPoint();
 
-            //if (transform.position == StairsManager.inst.platformData.startPoint.position)
             if (Vector3.Distance(transform.position, enemyPlatformData.startPoint.position) < 0.05f)
             {
 
-                Debug.Log("transform ====== start");
                 noOfSteps++;
                 isMovingUp = true;
             }
@@ -165,36 +145,15 @@ public class Enemy : MonoBehaviour
 
             enemyPlatformData = StairsManager.inst.platformPrefabs[enemyIndex + 1];
 
-            //PlayerStates = Aiming;
+            Events.BulletHitAction = null;
+
             MoveTowardsStart();
 
             noOfSteps = 0;
             newScale.x *= -1;
             moveDirection *= -1;
             transform.localScale = newScale;
-
-
-            //if (_enemyManager.enemy == null && _enemyManager.enemyCount >= 0)
-            //{
-            //    _enemyManager.SpawnEnemy();
-
-
-            //}
-            //else if (_enemyManager.bossEnemy == null && _enemyManager.bossCount > 0)
-            //{
-            //    _enemyManager.SpawnBoss();
-
-            //}
-
-
         }
-        else
-        {
-            //PlayerStates = null;
-        }
-
-
-
     }
 
 
@@ -230,30 +189,20 @@ public class Enemy : MonoBehaviour
 
     private void MoveTowardsEndPoint()
     {
-
         transform.position = Vector3.MoveTowards(transform.position, enemyPlatformData.endPoint.position, Time.deltaTime * moveSpeed);
     }
 
 
     private void MoveTowardsStart()
     {
-        Debug.Log("movetowards Start");
-
         targetPos = enemyPlatformData.startPoint.position;
     }
 
 
-
-
-
-
-
-
-
     public  void PointGunAtPlayer()
     {
-        Debug.Log("gunPointed");
-        Player player =  FindAnyObjectByType<Player>();
+
+        player = FindAnyObjectByType<Player>();
 
         Vector3 playerPos = player.transform.position;
         Vector3 direction = playerPos - transform.position;
@@ -267,13 +216,12 @@ public class Enemy : MonoBehaviour
     }
 
 
-
     public void Shoot()
     {
         if (!BulletShooted)
         {
 
-            Bullet newProjectile = Instantiate(_bulletPrefab, _gunTip.position, _gunTip.rotation);
+            GameObject newProjectile = Instantiate(_bulletPrefab, _gunTip.position, _gunTip.rotation);
             BulletShooted = true;
 
             Rigidbody2D projectileRb = newProjectile.GetComponent<Rigidbody2D>();
@@ -281,12 +229,13 @@ public class Enemy : MonoBehaviour
             if (projectileRb != null && transform.localScale.x > 0f)
             {
                 Debug.Log("positive Force");
-                projectileRb.AddForce(_gunTip.right * shootingForce, ForceMode2D.Impulse);
+                projectileRb.AddForce(_gunTip.right * -shootingForce, ForceMode2D.Impulse);
                 BulletShooted = true;
             }
 
             else
             {
+                
                 Debug.Log("negative Force");
                 projectileRb.AddForce(_gunTip.right * -shootingForce, ForceMode2D.Impulse);
                 BulletShooted = true;
@@ -294,9 +243,8 @@ public class Enemy : MonoBehaviour
             }
         }
 
+
     }
-
-
 
 
     private void OnDisable()
@@ -305,6 +253,5 @@ public class Enemy : MonoBehaviour
         EnemyMoveAction -= EnemyMove;
     }
     
-
 
 }

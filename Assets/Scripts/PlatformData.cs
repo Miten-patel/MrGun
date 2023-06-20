@@ -12,6 +12,7 @@ public class PlatformData : MonoBehaviour
     public Transform startPoint;
     public Transform endPoint;
     public Transform EnemyPoint;
+    public float StairsTotalHeight;
 
 
     private void Awake()
@@ -19,6 +20,8 @@ public class PlatformData : MonoBehaviour
         startPoint = gameObject.GetComponentInChildren<Transform>().GetChild(0);
         endPoint = gameObject.GetComponentInChildren<Transform>().GetChild(1);
         EnemyPoint = gameObject.GetComponentInChildren<Transform>().GetChild(2);
+
+        StairsTotalHeight = stairsHeight * noOfStairs;
     }
 
 }

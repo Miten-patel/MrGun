@@ -6,25 +6,25 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] float force;
     [SerializeField] private Rigidbody2D rb;
-    [SerializeField] private Enemy _enemy;
     [SerializeField] private int _damage = 100;
+
     private Transform _playerTransform;
     private Transform _gunTip;
-
     private bool isCollided;
+
 
     void Start()
     {
-        PlayerShoot(_gunTip,_playerTransform);
+        if (_playerTransform != null)
+        {
+            PlayerShoot(_gunTip, _playerTransform);
+        }
 
-        isCollided = false;
         Destroy(gameObject, 3);
     }
 
     private void OnDisable()
     {
-        Debug.Log(isCollided + "Iscollised");
-
         if(!isCollided)
         {
             Events.BulletMiss();
@@ -36,7 +36,6 @@ public class Bullet : MonoBehaviour
 
     public void PlayerShoot(Transform _gunTip, Transform _playerTransform)
     {
-        Debug.Log("PlayerSHoot");
         this._gunTip = _gunTip;
         this._playerTransform = _playerTransform;
 

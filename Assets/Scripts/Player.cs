@@ -27,16 +27,17 @@ public class Player : MonoBehaviour
 
     private bool bulletShooted;
 
-    //Rotation
-
+    [Header("Gun Aiming")]
     [SerializeField] private Transform _gun;
     private float _minAngle = 0;
     private float _maxAngle = 45f;
     private float _rotationSpeed = 40;
     private float currentAngle;
     private bool isAimingUp = true;
-    
-    public Action PlayerStates;
+
+
+
+    //public Action PlayerStates;
 
 
 
@@ -50,18 +51,19 @@ public class Player : MonoBehaviour
 
         MoveTowardsStart();
 
-
-        PlayerStates = Movements;
+        Events.PlayerStatesAction = Movements;
+        //PlayerStates = Movements;
     }
 
     private void Update()
     {
 
-       
-        if (PlayerStates != null)
-        {
-            PlayerStates.Invoke();
-        }
+        Events.PlayerStates();
+        
+        //if (PlayerStates != null)
+        //{
+        //    PlayerStates.Invoke();
+        //}
     }
 
 
@@ -71,24 +73,21 @@ public class Player : MonoBehaviour
         {
             MoveTowardsStartPoint();
 
-            //if (transform.position == StairsManager.inst.platformData.startPoint.position)
             if(Vector3.Distance(transform.position, StairsManager.inst.platformData.startPoint.position) < 0.05f)
             {
-                Debug.Log("ismovingup === trueeeee");
                 noOfSteps++;
                 isMovingUp = true;
             }
         }
         else if (noOfSteps <= StairsManager.inst.platformData.noOfStairs)
         {
-            Debug.Log("climbingggggggg  ");
             Climb();
         }
         else
         {
             MoveTowardsEndPoint();
 
-            if (transform.position == StairsManager.inst.platformData.endPoint.position)
+            if(Vector3.Distance(transform.position ,StairsManager.inst.platformData.endPoint.position) < 0.05)
             {
 
                 NextPlatformTransition();
@@ -103,8 +102,9 @@ public class Player : MonoBehaviour
         if (currentPlatformIndex < StairsManager.inst.platformPrefabs.Count)
         {
             currentPlatformIndex++;
-            
-            PlayerStates = Aiming;
+
+            Events.PlayerStatesAction = Aiming;
+            //PlayerStates = Aiming;
             StairsManager.inst.platformData = StairsManager.inst.platformPrefabs[currentPlatformIndex];
             MoveTowardsStart();
 
@@ -130,7 +130,8 @@ public class Player : MonoBehaviour
         }
         else
         {
-            PlayerStates = null;
+            //PlayerStates = null;
+            Events.PlayerStatesAction = null;
         }
 
 
@@ -149,7 +150,7 @@ public class Player : MonoBehaviour
         Vector2 newPos = Vector2.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
         transform.position = newPos;
 
-        if (newPos == targetPos)
+        if(Vector2.Distance(newPos,targetPos) < 0.05)
         {
             if (isMovingUp)
             {
@@ -222,10 +223,13 @@ public class Player : MonoBehaviour
         }
         else if( bulletShooted && _prefab == null) 
         {
-            PlayerStates = Movements;
+            Events.PlayerStatesAction = Movements;
+            //PlayerStates = Movements;
             bulletShooted = false;
         }
     }
+
+
 
 
     private void OnTriggerEnter2D(Collider2D collision)
